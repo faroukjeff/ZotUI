@@ -53,7 +53,6 @@ def runhellowlist():
 
     response = jsonify(output=output_string)
     return response
-    #return "<h5>{}</h5>".format(clean_output(output_string))
 
 def clean_output(output):
     find_key = '* This is '
