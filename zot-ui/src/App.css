@@ -15,25 +15,30 @@
   }
 }
 
+.Box{
+  width: 20px !important;
+}
 .CodeMirror{
-    width: 100vh;
+    width: 100vh !important;
     height: 100vh !important;
-    position:absolute;
 }
 
 .MuiBox-root{
     align-items: center !important;
-    justify-content: center !important;
+    margin-left: auto;
+    margin-right: auto;
+    /*justify-content: center;*/
+    /*justify-content:space-evenly;*/
   }
 
-  .MuiDivider-root {
-    height: 1px !important;
-    background-color: #4f5b62 !important;
-  }
+.MuiDivider-root {
+  height: 1px !important;
+  background-color: #4f5b62 !important;
+}
 
-  .MuiDrawer-paperAnchorDockedBottom{
-    border-top-color: #a4b3b6 !important;
-  }
+.MuiDrawer-paperAnchorDockedBottom{
+  border-top-color: #a4b3b6 !important;
+}
 
 .placeholderdiv{
     width: 99.55%;

@@ -163,7 +163,8 @@ const useStyles = makeStyles({
     width: 100,
   },
   fullList: {
-    width: 'auto',
+    width: 'fit-content',
+    minWidth: "100vw",
   },
 });
 
@@ -517,7 +518,7 @@ const toggleDrawer = (anchor, open) => (event) => {
         </div>
   <div>
   
-  <Box display="flex" flexDirection="row" p={0} m={0} bgcolor={themecolor} >
+  <Box display="flex" flexDirection="row" p={0} m={0} bgcolor={themecolor} overflow="scroll" >
     <Box p={1} >
     <div class="div-sep">
     &nbsp;&nbsp;Code Editor
