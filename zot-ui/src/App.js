@@ -1,4 +1,3 @@
-import './App.css';
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
@@ -10,8 +9,6 @@ import Icon from '@material-ui/core/Icon';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import {UnControlled as CodeMirror} from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/material.css';
 import clsx from 'clsx';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
@@ -24,12 +21,13 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import { withStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
+import './App.css';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/material.css';
+import 'codemirror/theme/eclipse.css';
 require('codemirror/mode/commonlisp/commonlisp');
 require('codemirror/mode/xml/xml');
 
-//require('codemirror/mode/python/python');
-//require('codemirror/mode/javascript/javascript');
-//import TextField from '@material-ui/core/TextField';
 
 const theme = createMuiTheme({
   palette: {
@@ -41,7 +39,6 @@ const theme = createMuiTheme({
     },
   },
 });
-
 
 const stylesDialog = (theme) => ({
   root: {
@@ -57,6 +54,7 @@ const stylesDialog = (theme) => ({
     color:"#FFFFFF",
   },
 });
+
 
 const DialogTitle = withStyles(stylesDialog)((props) => {
   const { children, classes, onClose, ...other } = props;
@@ -94,8 +92,6 @@ const buttonrun = makeStyles((theme) => ({
       margin: theme.spacing(1),
       color:"white",
       background: "#40916c"
-      //top: 15,
-      //width: '16ch',
     },
   },
 }));
@@ -106,8 +102,6 @@ const buttonin = makeStyles((theme) => ({
       margin: theme.spacing(1),
       color:"white",
       background: "#34a0a4"
-      //top: 15,
-      //width: '16ch',
     },
   },
 }));
@@ -118,8 +112,6 @@ const buttonout = makeStyles((theme) => ({
       margin: theme.spacing(1),
       color:"white",
       background: "#168aad"
-      //top: 15,
-      //width: '16ch',
     },
   },
 }));
@@ -130,8 +122,6 @@ const buttondoc = makeStyles((theme) => ({
       margin: theme.spacing(1),
       color:"white",
       background: "#1a759f"
-      //top: 15,
-      //width: '16ch',
     },
   },
 
@@ -143,8 +133,6 @@ const buttonpin = makeStyles((theme) => ({
       margin: theme.spacing(1),
       color:"white",
       background: "#1e6091"
-      //top: 15,
-      //width: '16ch',
     },
   },
 
@@ -156,8 +144,6 @@ const buttonshort = makeStyles((theme) => ({
       margin: theme.spacing(1),
       color:"white",
       background: "#184e77"
-      //top: 15,
-      //width: '16ch',
     },
   },
 
@@ -168,9 +154,6 @@ const buttondom = makeStyles((theme) => ({
     '& > *': {
       margin: theme.spacing(1),
       color:"white",
-      //background: "#1a759f"
-      //top: 15,
-      //width: '16ch',
     },
   },
 }));
@@ -192,6 +175,8 @@ const useStylesalert = makeStyles((theme) => ({
     },
   },
 }));
+
+
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -225,131 +210,121 @@ function App() {
     setOpensuccess(false);
   };
 
-const classesm = useStyles();
-const [state, setState] = React.useState({
-  top: false,
-  bottom:false
-});
+  const classesm = useStyles();
+  const [state, setState] = React.useState({
+    top: false,
+    bottom:false
+  });
 
 const toggleDrawer = (anchor, open) => (event) => {
   if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
     return;
   }
-  //let root = document.documentElement;
-
-  // if(open && drawer_mode==="temporary"){
-  //   root.style.setProperty('--pos-y', "90px");
-  // }
-
-  // if(!open && drawer_mode==="temporary"){
-  //   root.style.setProperty('--pos-y', "24px");
-  // }
-
 
   setState({ ...state, [anchor]: open });
 
-};
+  };
 
-const list = (anchor) => (
-  <div
-    className={clsx(classesm.list, {[classesm.fullList]:anchor === 'bottom',})}
-    role="presentation"
-    onClick={toggleDrawer(anchor, false)}
-    onKeyDown={toggleDrawer(anchor, false)}
-  >
-    
-    <Box display="flex" flexDirection="row" p={0} m={0} bgcolor="#a4b3b6">
-          <Box p={1} >
-            <div className={classesr.root}>
-            <Button
-              id="runbutton"
-              variant="contained" 
-              size='medium'
-              color="secondary"
-              onClick={() => sendApiRequest()} 
-              endIcon={<Icon>play_circle</Icon>}
-              >
-              Run
-              </Button>
-            </div>
-          </Box>
-          <Box p={1} >
-            <div className={classesi.root}>
-            <Button 
-              variant="contained" 
-              size='medium' 
-              color="primary" 
-              onClick={() => downloadTxtFile("input")} 
-              endIcon={<Icon>file_download</Icon>}
-              >
-              Download Code
-              </Button>
-            </div>
-          </Box>
+  const list = (anchor) => (
+    <div
+      className={clsx(classesm.list, {[classesm.fullList]:anchor === 'bottom',})}
+      role="presentation"
+      onClick={toggleDrawer(anchor, false)}
+      onKeyDown={toggleDrawer(anchor, false)}
+    >
+      
+      <Box display="flex" flexDirection="row" p={0} m={0} bgcolor="#a4b3b6">
+            <Box p={1} >
+              <div className={classesr.root}>
+              <Button
+                id="runbutton"
+                variant="contained" 
+                size='medium'
+                color="secondary"
+                onClick={() => sendApiRequest()} 
+                endIcon={<Icon>play_circle</Icon>}
+                >
+                Run
+                </Button>
+              </div>
+            </Box>
+            <Box p={1} >
+              <div className={classesi.root}>
+              <Button 
+                variant="contained" 
+                size='medium' 
+                color="primary" 
+                onClick={() => downloadTxtFile("input")} 
+                endIcon={<Icon>file_download</Icon>}
+                >
+                Download Code
+                </Button>
+              </div>
+            </Box>
 
-          <Box p={1} >
-            <div className={classeso.root}>
-            <Button
-              variant="contained" 
-              size='medium' 
-              color="primary" 
-              onClick={() => downloadTxtFile("output")} 
-              endIcon={<Icon>send_and_archive</Icon>}
-              >
-              Download output
-              </Button>
-            </div>
-          </Box>
+            <Box p={1} >
+              <div className={classeso.root}>
+              <Button
+                variant="contained" 
+                size='medium' 
+                color="primary" 
+                onClick={() => downloadTxtFile("output")} 
+                endIcon={<Icon>send_and_archive</Icon>}
+                >
+                Download output
+                </Button>
+              </div>
+            </Box>
 
-          <Box p={1} >
-            <div className={classesd.root}>
-            <Button 
-              variant="contained" 
-              size= 'medium' 
-              color="primary"
-              endIcon={<Icon>sim_card_download</Icon>}
-              href='https://github.com/fm-polimi/zot/raw/master/doc/zot-man.pdf'
-              >
-              Docs
-              </Button>
-            </div>
-          </Box>
+            <Box p={1} >
+              <div className={classesd.root}>
+              <Button 
+                variant="contained" 
+                size= 'medium' 
+                color="primary"
+                endIcon={<Icon>{darkmodebuttonicon}</Icon>}
+                onClick={() => toggledarkmode()}
+                >
+                {darkmodebutton}
+                </Button>
+              </div>
+            </Box>
 
-          <Box p={1} >
-            <div className={classesp.root}>
-            <Button
-              id="pinbutton"
-              variant="contained" 
-              size='medium' 
-              color="primary" 
-              onClick={() => togglehidemenu()} 
-              endIcon={<Icon>push_pin</Icon>}
-              >
-              {pinbutton_title}
-              </Button>
-            </div>
-          </Box>
+            <Box p={1} >
+              <div className={classesp.root}>
+              <Button
+                id="pinbutton"
+                variant="contained" 
+                size='medium' 
+                color="primary" 
+                onClick={() => togglehidemenu()} 
+                endIcon={<Icon>push_pin</Icon>}
+                >
+                {pinbutton_title}
+                </Button>
+              </div>
+            </Box>
 
-          <Box p={1} >
-            <div className={classesshort.root}>
-            <Button
-              variant="contained" 
-              size='medium' 
-              color="primary" 
-              onClick={() => handleClickOpenDialog()} 
-              endIcon={<Icon>shortcut</Icon>}
-              >
-              keyboard Shortcuts
-              </Button>
-            </div>
-          </Box>
+            <Box p={1} >
+              <div className={classesshort.root}>
+              <Button
+                variant="contained" 
+                size='medium' 
+                color="primary" 
+                onClick={() => handleClickOpenDialog()} 
+                endIcon={<Icon>shortcut</Icon>}
+                >
+                keyboard Shortcuts
+                </Button>
+              </div>
+            </Box>
 
-          </Box>
-        <div>
-        </div>
+            </Box>
+          <div>
+          </div>
 
-  </div>
-);
+    </div>
+  );
 
   const classesr = buttonrun();
   const classesi = buttonin();
@@ -366,7 +341,11 @@ const list = (anchor) => (
   const [button_enable, setbutton_mode] = React.useState(false);
   const [pinbutton_title, setpinbutton_title] = React.useState("Pin Menu");
   const [bottomholder, setbottomholder] = React.useState({display: 'none'});
-
+  const [darkmode, setdarkmode] = React.useState(true);
+  const [themecolor, setthemecolor] = React.useState('#4f5b62');
+  const [codemirrortheme, setcodemirrortheme] = React.useState('material');
+  const [darkmodebutton, setdarkmodebutton] = React.useState('Light Theme');
+  const [darkmodebuttonicon, setdarkmodebuttonicon] = React.useState('brightness_3');
   const [openDialog, setOpenDialog] = React.useState(false);
 
   const handleClickOpenDialog = () => {
@@ -381,7 +360,7 @@ const list = (anchor) => (
     setValue(event.target.value);
   };
 
-   function sendApiRequest() {
+  function sendApiRequest() {
     var flag = 0;
     const array = ["uiop:", ":getenv", "run-program"]
     array.forEach(function (item, index) {
@@ -407,10 +386,7 @@ const list = (anchor) => (
           setOpensuccess(true)
         }
       });
-
-      //setOutputCode(inputcode);
     }
-    
   }
 
   function downloadTxtFile(mode){
@@ -462,28 +438,49 @@ const list = (anchor) => (
     }    
   }
 
+  function toggledarkmode(){
+    let root = document.documentElement;
+    if(darkmode){
+      setcodemirrortheme("eclipse");
+      setdarkmode(false)
+      setdarkmodebutton("Dark Theme")
+      setthemecolor("#dcdee0")
+      root.style.setProperty('--color-sep', "#1a759f");
+      setdarkmodebuttonicon("light_mode");
+    }else{
+      setcodemirrortheme("material");
+      setdarkmode(true)
+      setdarkmodebutton("Light Theme")
+      setthemecolor("#4f5b62")
+      root.style.setProperty('--color-sep', "#263238");
+      setdarkmodebuttonicon("brightness_3");
+    }
+  }
+
 
   return (
-    <html lang="en">
+  <html lang="en">
+    <div>
+      < KeyboardEventHandler
+        handleFocusableElements = "true"
+        handleKeys={['ctrl+i']}
+        onKeyEvent={(key, e) => clickbutton()} />
 
-  <div>
-  < KeyboardEventHandler
-    handleFocusableElements = "true"
-    handleKeys={['ctrl+y']}
-    onKeyEvent={(key, e) => clickbutton()} />
+    < KeyboardEventHandler
+        handleFocusableElements = "true"
+        handleKeys={['ctrl+q']}
+        onKeyEvent={(key, e) => {togglehidemenu()}} />
 
-< KeyboardEventHandler
-    handleFocusableElements = "true"
-    handleKeys={['ctrl+q']}
-    onKeyEvent={(key, e) => {togglehidemenu()}} />
+    < KeyboardEventHandler
+        handleFocusableElements = "true"
+        handleKeys={['ctrl+b']}
+        onKeyEvent={(key, e) => document.getElementById('menuicon').click()} />
 
-< KeyboardEventHandler
-    handleFocusableElements = "true"
-    handleKeys={['ctrl+b']}
-    onKeyEvent={(key, e) => document.getElementById('menuicon').click()} />
-
-
-  </div>
+    < KeyboardEventHandler
+        handleFocusableElements = "true"
+        handleKeys={['ctrl+m']}
+        onKeyEvent={(key, e) => toggledarkmode()} />
+    </div>
 
     <div>
       <ThemeProvider theme={theme}>
@@ -520,38 +517,38 @@ const list = (anchor) => (
         </div>
   <div>
   
-  <Box display="flex" flexDirection="row" p={0} m={0} bgcolor="#4f5b62" >
-  <Box p={1} >
-  <div class="div-sep">
-  &nbsp;&nbsp;Code Editor
-    <br></br>
-  </div>
-    <CodeMirror
-        value=';Input Code Here'
-        options={{
-          mode: 'commonlisp',
-          theme: 'material',
-          lineNumbers: true
-        }}
-        onChange={(editor, data, value) => setInputCode(value) }
-  />
-  </Box>
-
-  <Box p={1} >
-  <div class="div-sep">
-  &nbsp;&nbsp;Zot Output
-    <br></br>
-  </div>
-    <CodeMirror
-        value={outputcode}
-        options={{
-          mode: "text",
-          theme: 'material',
-          lineNumbers: false
-        }}
-        onChange={(editor, data, value) => {} }
+  <Box display="flex" flexDirection="row" p={0} m={0} bgcolor={themecolor} >
+    <Box p={1} >
+    <div class="div-sep">
+    &nbsp;&nbsp;Code Editor
+      <br></br>
+    </div>
+      <CodeMirror
+          value=';Input Code Here'
+          options={{
+            mode: 'commonlisp',
+            theme: codemirrortheme,
+            lineNumbers: true
+          }}
+          onChange={(editor, data, value) => setInputCode(value) }
     />
-  </Box>
+    </Box>
+
+    <Box p={1} >
+    <div class="div-sep">
+    &nbsp;&nbsp;Zot Output
+      <br></br>
+    </div>
+      <CodeMirror
+          value={outputcode}
+          options={{
+            mode: "text",
+            theme: codemirrortheme,
+            lineNumbers: false
+          }}
+          onChange={(editor, data, value) => {} }
+      />
+    </Box>
   </Box>
     </div>
     <div>
@@ -561,7 +558,7 @@ const list = (anchor) => (
         </DialogTitle>
         <DialogContent dividers>
           <Typography gutterBottom>
-            Press CTRL+Y to Run the Code
+            Press CTRL+I to Run the Code
           </Typography>
           <Typography gutterBottom>
             Press CTRL+Q to Pin/Unpin the Menu
@@ -569,12 +566,14 @@ const list = (anchor) => (
           <Typography gutterBottom>
             Press CTRL+B to Show the Menu
           </Typography>
+          <Typography gutterBottom>
+            Press CTRL+M to Toggle Theme
+          </Typography>
         </DialogContent>
         <DialogActions>
         </DialogActions>
       </Dialog>
     </div>
-
 
     <div className={classesalert.root}>
       <Snackbar open={warnopen} autoHideDuration={6000} onClose={handleClosewarn} >
