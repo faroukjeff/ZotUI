@@ -62,3 +62,9 @@
 .MuiSnackbar-anchorOriginBottomCenter{
     bottom: var(--pos-y) !important;
 }
+
+#buttondark{
+  position: absolute;
+  color: #FFFFFF;
+  right: 0;
+}

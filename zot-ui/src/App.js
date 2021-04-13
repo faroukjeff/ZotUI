@@ -21,6 +21,7 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import { withStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
+import GitHubIcon from '@material-ui/icons/GitHub';
 import './App.css';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
@@ -54,7 +55,6 @@ const stylesDialog = (theme) => ({
     color:"#FFFFFF",
   },
 });
-
 
 const DialogTitle = withStyles(stylesDialog)((props) => {
   const { children, classes, onClose, ...other } = props;
@@ -121,7 +121,7 @@ const buttondoc = makeStyles((theme) => ({
     '& > *': {
       margin: theme.spacing(1),
       color:"white",
-      background: "#1a759f"
+      background: "#2d3142"
     },
   },
 
@@ -176,8 +176,6 @@ const useStylesalert = makeStyles((theme) => ({
     },
   },
 }));
-
-
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -278,20 +276,6 @@ const toggleDrawer = (anchor, open) => (event) => {
             </Box>
 
             <Box p={1} >
-              <div className={classesd.root}>
-              <Button 
-                variant="contained" 
-                size= 'medium' 
-                color="primary"
-                endIcon={<Icon>{darkmodebuttonicon}</Icon>}
-                onClick={() => toggledarkmode()}
-                >
-                {darkmodebutton}
-                </Button>
-              </div>
-            </Box>
-
-            <Box p={1} >
               <div className={classesp.root}>
               <Button
                 id="pinbutton"
@@ -316,6 +300,21 @@ const toggleDrawer = (anchor, open) => (event) => {
                 endIcon={<Icon>shortcut</Icon>}
                 >
                 keyboard Shortcuts
+                </Button>
+              </div>
+            </Box>
+
+            <Box p={1} >
+              <div className={classesd.root}>
+              <Button 
+                variant="contained" 
+                size= 'medium' 
+                color="primary"
+                endIcon={<GitHubIcon />}
+                href="https://github.com/fm-polimi/zot"
+                target="_blank"
+                >
+                Source Code
                 </Button>
               </div>
             </Box>
@@ -345,8 +344,7 @@ const toggleDrawer = (anchor, open) => (event) => {
   const [darkmode, setdarkmode] = React.useState(true);
   const [themecolor, setthemecolor] = React.useState('#4f5b62');
   const [codemirrortheme, setcodemirrortheme] = React.useState('material');
-  const [darkmodebutton, setdarkmodebutton] = React.useState('Light Theme');
-  const [darkmodebuttonicon, setdarkmodebuttonicon] = React.useState('brightness_3');
+  const [darkmodebuttonicon, setdarkmodebuttonicon] = React.useState('light_mode');
   const [openDialog, setOpenDialog] = React.useState(false);
 
   const handleClickOpenDialog = () => {
@@ -363,7 +361,7 @@ const toggleDrawer = (anchor, open) => (event) => {
 
   function sendApiRequest() {
     var flag = 0;
-    const array = ["uiop:", ":getenv", "run-program"]
+    const array = ["uiop:", ":getenv", "run-program","call-system","sys:","excl:","sb-ext:"]
     array.forEach(function (item, index) {
       if(inputcode.includes(item)){
         setOpenwarn(true);
@@ -371,17 +369,17 @@ const toggleDrawer = (anchor, open) => (event) => {
         flag=1;
       }
     });
-    if (flag ===0){
+    if (flag ===0 && inputcode!==""){
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cmd: inputcode })
         };
-      fetch('http://192.168.1.3:5000/listhellow/', requestOptions)
+      fetch('http://192.168.1.2:5000/listhellow/', requestOptions)
       .then(response => response.json())
       .then(data => {
         setOutputCode(data.output)
-        if(data.output.includes("Unhandled") && data.output != null){
+        if( (data.output.includes("Unhandled") || data.output.includes("ZOT ERROR#ERRSTD") ) && data.output != null){
           setOpenerror(true)
         }else{
           setOpensuccess(true)
@@ -444,17 +442,15 @@ const toggleDrawer = (anchor, open) => (event) => {
     if(darkmode){
       setcodemirrortheme("eclipse");
       setdarkmode(false)
-      setdarkmodebutton("Dark Theme")
       setthemecolor("#dcdee0")
       root.style.setProperty('--color-sep', "#1a759f");
-      setdarkmodebuttonicon("light_mode");
+      setdarkmodebuttonicon("brightness_3");
     }else{
       setcodemirrortheme("material");
       setdarkmode(true)
-      setdarkmodebutton("Light Theme")
       setthemecolor("#4f5b62")
       root.style.setProperty('--color-sep', "#263238");
-      setdarkmodebuttonicon("brightness_3");
+      setdarkmodebuttonicon("light_mode");
     }
   }
 
@@ -502,7 +498,17 @@ const toggleDrawer = (anchor, open) => (event) => {
                       component="span">
                       <Icon>menu</Icon>
                       </IconButton>
+                    
+                    <IconButton
+                      id="buttondark"
+                      size= 'medium'
+                      onClick={() => toggledarkmode()}
+                      component="span">
+                      <Icon>{darkmodebuttonicon}</Icon>
+                    </IconButton>
+                    
                     </div>
+
                     <Drawer anchor={anchor} open={state[anchor]} variant={drawer_mode} onClose={toggleDrawer(anchor, false)}>
                       {list(anchor)}
                     </Drawer>
