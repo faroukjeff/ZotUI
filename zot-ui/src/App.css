@@ -18,17 +18,23 @@
 .Box{
   width: 20px !important;
 }
+
+/* #codemirrorinput{
+  width: 100vh !important;
+  height: 100vh !important;
+} */
+
 .CodeMirror{
-    width: 100vh !important;
+    width: 95vh !important;
     height: 100vh !important;
 }
 
 .MuiBox-root{
-    align-items: center !important;
+    align-items: top;
     margin-left: auto;
     margin-right: auto;
-    /*justify-content: center;*/
-    /*justify-content:space-evenly;*/
+    /*justify-content: center;
+    justify-content:space-evenly;*/
   }
 
 .MuiDivider-root {
@@ -49,6 +55,9 @@
 :root {
   --pos-y: 24px;
   --color-sep: #263238;
+  --color-accordiontext:white;
+  --color-accordionback:#2e424b;
+  --color-accordiondet:#4f5b62;
 }
 
 .div-sep{
@@ -67,4 +76,12 @@
   position: absolute;
   color: #FFFFFF;
   right: 0;
+}
+
+#panel1a-header{
+  color: var(--color-accordiontext);
+  background-color: var(--color-accordionback);
+}
+.MuiAccordionDetails-root{
+  background-color: var(--color-accordiondet);
 }

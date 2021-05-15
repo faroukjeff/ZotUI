@@ -22,6 +22,10 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import { withStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import GitHubIcon from '@material-ui/icons/GitHub';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './App.css';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
@@ -174,6 +178,16 @@ const useStylesalert = makeStyles((theme) => ({
     '& > * + *': {
       marginTop: theme.spacing(2),
     },
+  },
+}));
+
+const useStylesAccordion = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
   },
 }));
 
@@ -333,10 +347,13 @@ const toggleDrawer = (anchor, open) => (event) => {
   const classesp = buttonpin();
   const classesdrawer = buttondom();
   const classesshort = buttonshort();
+  const classesaccordion = useStylesAccordion();
   // eslint-disable-next-line
   const [value, setValue] = React.useState('Controlled');
   const [inputcode, setInputCode] = React.useState();
-  const [outputcode, setOutputCode] = React.useState("Output Will be Shown Here :)");
+  const [header, setHeader] = React.useState("Header Will be Shown Here :)");
+  const [outcome, setOutcome] = React.useState("Outcome Will be Shown Here :)");
+  const [trace, setTrace] = React.useState("Trace Will be Shown Here :)");
   const [drawer_mode, setdrawer_mode] = React.useState('temporary');
   const [button_enable, setbutton_mode] = React.useState(false);
   const [pinbutton_title, setpinbutton_title] = React.useState("Pin Menu");
@@ -346,6 +363,9 @@ const toggleDrawer = (anchor, open) => (event) => {
   const [codemirrortheme, setcodemirrortheme] = React.useState('material');
   const [darkmodebuttonicon, setdarkmodebuttonicon] = React.useState('light_mode');
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [disableAccord, setDisableAccord] = React.useState(false);
+  const [disableAccordOutcome, setDisableAccordOutcome] = React.useState(false);
+  const [accordionItems, setAccordionItems] = React.useState([{ label: 'Nothing to Show', text: '' }]);
 
   const handleClickOpenDialog = () => {
     setOpenDialog(true);
@@ -365,7 +385,9 @@ const toggleDrawer = (anchor, open) => (event) => {
     array.forEach(function (item, index) {
       if(inputcode.includes(item)){
         setOpenwarn(true);
-        setOutputCode("Code Contains Banned Operation: " + item)
+        setHeader("Code Contains Banned Operation: " + item)
+        setDisableAccord(true)
+        setDisableAccordOutcome(true)
         flag=1;
       }
     });
@@ -375,17 +397,61 @@ const toggleDrawer = (anchor, open) => (event) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cmd: inputcode })
         };
-      fetch('http://192.168.1.2:5000/listhellow/', requestOptions)
+      fetch('http://192.168.1.8:5000/listhellow/', requestOptions)
       .then(response => response.json())
       .then(data => {
-        setOutputCode(data.output)
-        if( (data.output.includes("Unhandled") || data.output.includes("ZOT ERROR#ERRSTD") ) && data.output != null){
-          setOpenerror(true)
-        }else{
-          setOpensuccess(true)
-        }
+          if((data.output.includes("UNSATISFIABLE"))){
+            var tokenheader = data.output.search("UNSATISFIABLE")
+            var tokenoutcome = data.output.search("---------UNSAT---------")
+            setDisableAccordOutcome(false)
+            setHeader(data.output.substring(0,tokenheader+13))
+            setOutcome(data.output.substring(tokenheader,tokenoutcome))
+            setDisableAccord(true)
+            setTrace("Unsatisfiable Model :/ No Trace Will be Shown")
+          }
+          if(!(data.output.includes("UNSATISFIABLE"))){
+            var tokenheaderS = data.output.search("SATISFIABLE")
+            var tokenoutcomeS = data.output.search("------ time 0 ------")
+            setDisableAccordOutcome(false)
+            setHeader(data.output.substring(0,tokenheaderS+11))
+            setOutcome(data.output.substring(tokenheaderS,tokenoutcomeS))
+            setDisableAccord(false)
+            try{
+              makeCollapsibleTrace(data.output.substring(tokenoutcomeS,data.output.length))
+            } catch(err){
+              
+            }
+            setTrace(data.output.substring(tokenoutcomeS,data.output.length))
+          }
+          
+          if( (data.output.includes("Unhandled") || data.output.includes("ZOT ERROR#ERRSTD") ) && data.output != null){
+            setHeader(data.output)
+            setOutcome("")
+            setTrace("")
+            setDisableAccord(true)
+            setDisableAccordOutcome(true)
+            setOpenerror(true)
+          }else{
+            setOpensuccess(true)
+          }
       });
     }
+  }
+
+  function makeCollapsibleTrace(traceString){
+    var doc = traceString.split("------")
+    doc.shift()
+    var constarr = "["
+    doc.forEach(function(item,index) {
+
+        if(index%2===0){
+            constarr = constarr + `{"label":"${doc[index]}","text":"${doc[index+1]}"},`
+        }
+    }
+    );
+    constarr = constarr.substring(0,constarr.length-1) + "]"
+    var traceaccordionparsed = JSON.parse(constarr.replace(/[\r]?[\n]/g, '\\n'))
+    setAccordionItems(traceaccordionparsed)
   }
 
   function downloadTxtFile(mode){
@@ -397,7 +463,7 @@ const toggleDrawer = (anchor, open) => (event) => {
       filename = "zotCode.lisp";
     }
     else{
-      textoption = outputcode;
+      textoption = header + outcome + trace;
       filename = "zotOutput.txt";
     }
     const file = new Blob([textoption],    
@@ -444,12 +510,18 @@ const toggleDrawer = (anchor, open) => (event) => {
       setdarkmode(false)
       setthemecolor("#dcdee0")
       root.style.setProperty('--color-sep', "#1a759f");
+      root.style.setProperty('--color-accordiontext', "black");
+      root.style.setProperty('--color-accordionback', "#f0f2f5");
+      root.style.setProperty('--color-accordiondet', "#dcdee0");
       setdarkmodebuttonicon("brightness_3");
     }else{
       setcodemirrortheme("material");
       setdarkmode(true)
       setthemecolor("#4f5b62")
       root.style.setProperty('--color-sep', "#263238");
+      root.style.setProperty('--color-accordiontext', "white");
+      root.style.setProperty('--color-accordionback', "#2e424b");
+      root.style.setProperty('--color-accordiondet', "#4f5b62");
       setdarkmodebuttonicon("light_mode");
     }
   }
@@ -531,6 +603,7 @@ const toggleDrawer = (anchor, open) => (event) => {
       <br></br>
     </div>
       <CodeMirror
+          id='codemirrorinput'
           value=';Input Code Here'
           options={{
             mode: 'commonlisp',
@@ -546,15 +619,84 @@ const toggleDrawer = (anchor, open) => (event) => {
     &nbsp;&nbsp;Zot Output
       <br></br>
     </div>
-      <CodeMirror
-          value={outputcode}
-          options={{
-            mode: "text",
-            theme: codemirrortheme,
-            lineNumbers: false
-          }}
-          onChange={(editor, data, value) => {} }
-      />
+    <Accordion>
+      <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography className={classesaccordion.heading}>Header</Typography>
+      </AccordionSummary>
+        <AccordionDetails>
+          <CodeMirror
+              value={header}
+              options={{
+                mode: "text",
+                theme: codemirrortheme,
+                lineNumbers: false
+              }}
+              onChange={(editor, data, value) => {} }
+          />
+        </AccordionDetails>
+    </Accordion>
+    <Accordion disabled = {disableAccordOutcome}>
+      <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography className={classesaccordion.heading}>Outcome</Typography>
+      </AccordionSummary>
+        <AccordionDetails>
+          <CodeMirror
+              value={outcome}
+              options={{
+                mode: "text",
+                theme: codemirrortheme,
+                lineNumbers: false
+              }}
+              onChange={(editor, data, value) => {} }
+          />
+        </AccordionDetails>
+    </Accordion>
+
+    <Accordion disabled = {disableAccord}>
+        <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+              >
+              <Typography className={classesaccordion.heading}>Trace</Typography>
+        </AccordionSummary>
+        
+          {accordionItems.map((item, index) => (
+          <AccordionDetails>
+            <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+              >
+              <Typography className={classesaccordion.heading}>{item.label}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+              <CodeMirror
+                  value={item.text}
+                  options={{
+                    mode: "text",
+                    theme: codemirrortheme,
+                    lineNumbers: false
+                  }}
+                  onChange={(editor, data, value) => {} }
+              />
+              </AccordionDetails>
+              </Accordion>
+              </AccordionDetails>
+              ))}
+          
+    </Accordion>
+
+
     </Box>
   </Box>
     </div>
