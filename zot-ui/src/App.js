@@ -397,7 +397,7 @@ const toggleDrawer = (anchor, open) => (event) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cmd: inputcode })
         };
-      fetch('http://192.168.1.8:5000/listhellow/', requestOptions)
+      fetch('http://192.168.1.7:5000/execzot/', requestOptions)
       .then(response => response.json())
       .then(data => {
           if((data.output.includes("UNSATISFIABLE"))){
@@ -419,7 +419,6 @@ const toggleDrawer = (anchor, open) => (event) => {
             try{
               makeCollapsibleTrace(data.output.substring(tokenoutcomeS,data.output.length))
             } catch(err){
-              
             }
             setTrace(data.output.substring(tokenoutcomeS,data.output.length))
           }
@@ -441,17 +440,18 @@ const toggleDrawer = (anchor, open) => (event) => {
   function makeCollapsibleTrace(traceString){
     var doc = traceString.split("------")
     doc.shift()
-    var constarr = "["
+    var tracelist = []
     doc.forEach(function(item,index) {
 
-        if(index%2===0){
-            constarr = constarr + `{"label":"${doc[index]}","text":"${doc[index+1]}"},`
-        }
-    }
-    );
-    constarr = constarr.substring(0,constarr.length-1) + "]"
-    var traceaccordionparsed = JSON.parse(constarr.replace(/[\r]?[\n]/g, '\\n'))
-    setAccordionItems(traceaccordionparsed)
+      if(index%2===0){
+          var iterTrace = {}
+          iterTrace["label"]= doc[index].trim()
+          iterTrace["text"]=doc[index+1]
+          tracelist.push(iterTrace)
+      }
+  }
+  );
+    setAccordionItems(tracelist)
   }
 
   function downloadTxtFile(mode){
@@ -525,7 +525,6 @@ const toggleDrawer = (anchor, open) => (event) => {
       setdarkmodebuttonicon("light_mode");
     }
   }
-
 
   return (
   <html lang="en">
