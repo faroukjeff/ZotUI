@@ -10,17 +10,9 @@ from subprocess import Popen, PIPE
 app = flask.Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-trusted_ips = ["192.168.1.10","192.168.1.56","127.0.0.1"]
-
-#API TEST Function
-@app.route('/lispAPI/', methods=['GET', 'POST'])
-@cross_origin()
-def welcome():
-    name = request.args['name']
-    return "<h1>Hi {}, <br> This is a Zot API</h1>".format(name)
 
 #Executes the zot commands by invoking a sbcl subprocess
-@app.route('/listhellow/', methods=['GET', 'POST'])
+@app.route('/execzot/', methods=['GET', 'POST'])
 @cross_origin() #Using CROSS for Security, to allow exchange of external ressouces safely
 def runhellowlist():
     json_req = request.get_json() #GET zot code from app
@@ -77,11 +69,6 @@ def clean_output(output): #Removing unecessary text from returned output
         ret_output = ret_output[:end]
 
     return ret_output
-
-@app.before_request #runs before request is processed and if the ip address of the request is not trusted then the access is forbidden
-def internal_ip_firewall():
-    if request.remote_addr not in trusted_ips:
-        abort(403)  # Returns 403 Forbidden HTTP Request Response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
