@@ -367,6 +367,7 @@ const toggleDrawer = (anchor, open) => (event) => {
   const [disableAccordOutcome, setDisableAccordOutcome] = React.useState(false);
   const [accordionItems, setAccordionItems] = React.useState([{ label: 'Nothing to Show', text: '' }]);
 
+
   const handleClickOpenDialog = () => {
     setOpenDialog(true);
   };
@@ -397,7 +398,7 @@ const toggleDrawer = (anchor, open) => (event) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cmd: inputcode })
         };
-      fetch('http://192.168.1.7:5000/execzot/', requestOptions)
+      fetch('http://192.168.1.8:5000/execzot/', requestOptions)
       .then(response => response.json())
       .then(data => {
           if((data.output.includes("UNSATISFIABLE"))){
@@ -445,7 +446,11 @@ const toggleDrawer = (anchor, open) => (event) => {
 
       if(index%2===0){
           var iterTrace = {}
-          iterTrace["label"]= doc[index].trim()
+          if(doc[index+1].includes("**LOOP**")){
+            iterTrace["label"]= doc[index].trim() +" **LOOP**"
+          }else{
+            iterTrace["label"]= doc[index].trim()
+          }
           iterTrace["text"]=doc[index+1]
           tracelist.push(iterTrace)
       }
@@ -490,6 +495,23 @@ const toggleDrawer = (anchor, open) => (event) => {
       setpinbutton_title("Pin Menu")
       setbottomholder({display: "none"})
 
+    }
+  }
+
+  function toggleExpand(accordionExpand){
+    var accordions = document.querySelectorAll('[id=panel1a-header]');
+    if (accordionExpand){
+      accordions.forEach(accordion => {
+        if(accordion.getAttribute("aria-expanded")==="true"){
+          accordion.click();
+        }
+      })
+    }else{
+      accordions.forEach(accordion => {
+        if(accordion.getAttribute("aria-expanded")==="false"){
+          accordion.click()
+        }
+      })
     }
   }
 
@@ -594,7 +616,7 @@ const toggleDrawer = (anchor, open) => (event) => {
         <Toolbar style={{minHeight:'72px'}} />
         </div>
   <div>
-  
+  <div class="boxclass">
   <Box display="flex" flexDirection="row" p={0} m={0} bgcolor={themecolor} overflow="scroll" >
     <Box p={1} >
     <div class="div-sep">
@@ -612,13 +634,26 @@ const toggleDrawer = (anchor, open) => (event) => {
           onChange={(editor, data, value) => setInputCode(value) }
     />
     </Box>
-
     <Box p={1} >
-    <div class="div-sep">
+    <div class="div-sep" id="outputsep">
     &nbsp;&nbsp;Zot Output
+    <IconButton 
+      id="buttonexpand"
+      size= 'medium'
+      onClick={() => toggleExpand(false)}
+      component="span">
+      <Icon>add_circle</Icon>
+    </IconButton>
+    <IconButton 
+      id="buttonreduce"
+      size= 'medium'
+      onClick={() => toggleExpand(true)}
+      component="span">
+      <Icon>remove_circle</Icon>
+    </IconButton>
       <br></br>
     </div>
-    <Accordion>
+    <Accordion id="headeraccordion">
       <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
@@ -627,6 +662,7 @@ const toggleDrawer = (anchor, open) => (event) => {
           <Typography className={classesaccordion.heading}>Header</Typography>
       </AccordionSummary>
         <AccordionDetails>
+          <div class="headerdiv">
           <CodeMirror
               value={header}
               options={{
@@ -636,6 +672,7 @@ const toggleDrawer = (anchor, open) => (event) => {
               }}
               onChange={(editor, data, value) => {} }
           />
+          </div>
         </AccordionDetails>
     </Accordion>
     <Accordion disabled = {disableAccordOutcome}>
@@ -647,6 +684,7 @@ const toggleDrawer = (anchor, open) => (event) => {
           <Typography className={classesaccordion.heading}>Outcome</Typography>
       </AccordionSummary>
         <AccordionDetails>
+        <div class="headerdiv">
           <CodeMirror
               value={outcome}
               options={{
@@ -656,6 +694,7 @@ const toggleDrawer = (anchor, open) => (event) => {
               }}
               onChange={(editor, data, value) => {} }
           />
+        </div>
         </AccordionDetails>
     </Accordion>
 
@@ -679,6 +718,7 @@ const toggleDrawer = (anchor, open) => (event) => {
               <Typography className={classesaccordion.heading}>{item.label}</Typography>
               </AccordionSummary>
               <AccordionDetails>
+              <div class="headerdiv">
               <CodeMirror
                   value={item.text}
                   options={{
@@ -688,6 +728,7 @@ const toggleDrawer = (anchor, open) => (event) => {
                   }}
                   onChange={(editor, data, value) => {} }
               />
+              </div>
               </AccordionDetails>
               </Accordion>
               </AccordionDetails>
@@ -698,6 +739,7 @@ const toggleDrawer = (anchor, open) => (event) => {
 
     </Box>
   </Box>
+  </div>
     </div>
     <div>
       <Dialog onClose={handleCloseDialog} aria-labelledby="customized-dialog-title" open={openDialog}>
