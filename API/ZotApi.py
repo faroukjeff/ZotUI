@@ -14,7 +14,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 #Executes the zot commands by invoking a sbcl subprocess
 @app.route('/execzot/', methods=['GET', 'POST'])
 @cross_origin() #Using CROSS for Security, to allow exchange of external ressouces safely
-def runhellowlist():
+def execzot():
     json_req = request.get_json() #GET zot code from app
     banned_keys = ["uiop:",":getenv","run-program","call-system","sys:","excl:","sb-ext:"]#banned plugins and functions due to security
     cmd_zot = json_req["cmd"]
