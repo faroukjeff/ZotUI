@@ -201,6 +201,8 @@ function App() {
   const [warnopen, setOpenwarn] = React.useState(false);
   const [erroropen, setOpenerror] = React.useState(false);
   const [successopen, setOpensuccess] = React.useState(false);
+  const [clipsuccess, setclipsuccess] = React.useState(false);
+  const [clipfail, setclipfail] = React.useState(false);
 
   const handleClosewarn = (event, reason) => {
     if (reason === 'clickaway') {
@@ -223,6 +225,19 @@ function App() {
     setOpensuccess(false);
   };
 
+  const handleclipsuccess = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setclipsuccess(false);
+  };
+
+  const handleclipfail = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setclipfail(false);
+  };
   const classesm = useStyles();
   const [state, setState] = React.useState({
     top: false,
@@ -398,7 +413,7 @@ const toggleDrawer = (anchor, open) => (event) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cmd: inputcode })
         };
-      fetch('http://192.168.1.8:5000/execzot/', requestOptions)
+      fetch('http://192.168.1.6:5000/execzot/', requestOptions)
       .then(response => response.json())
       .then(data => {
           if((data.output.includes("UNSATISFIABLE"))){
@@ -468,7 +483,13 @@ const toggleDrawer = (anchor, open) => (event) => {
       filename = "zotCode.lisp";
     }
     else{
-      textoption = header + outcome + trace;
+      textoption = header;
+      if (!disableAccordOutcome) {
+        textoption += "\n" + outcome;
+      }
+      if (!disableAccord){
+        textoption += "\n" + trace;
+      }
       filename = "zotOutput.txt";
     }
     const file = new Blob([textoption],    
@@ -513,6 +534,23 @@ const toggleDrawer = (anchor, open) => (event) => {
         }
       })
     }
+  }
+
+  function copyOutput(){
+    var tocopy = header ;
+    if (!disableAccordOutcome) {
+      tocopy += "\n" + outcome;
+    }
+    if (!disableAccord){
+      tocopy += "\n" + trace;
+    }
+    navigator.clipboard.writeText(tocopy).then(function() {
+      /* clipboard successfully set */
+      setclipsuccess(true)
+    }, function() {
+      /* clipboard write failed */
+      setclipfail(true)
+    });
   }
 
   function clickbutton(){
@@ -651,6 +689,13 @@ const toggleDrawer = (anchor, open) => (event) => {
       component="span">
       <Icon>remove_circle</Icon>
     </IconButton>
+    <IconButton 
+      id="buttonreduce"
+      size= 'medium'
+      onClick={() => copyOutput()}
+      component="span">
+      <Icon>content_copy</Icon>
+    </IconButton>
       <br></br>
     </div>
     <Accordion id="headeraccordion">
@@ -781,6 +826,18 @@ const toggleDrawer = (anchor, open) => (event) => {
       <Snackbar open={successopen} autoHideDuration={2000} onClose={handleClosesuccess}>
         <Alert onClose={handleClosesuccess} severity="success">
           Code Executed Successfully!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar open={clipsuccess} autoHideDuration={2000} onClose={handleclipsuccess}>
+        <Alert onClose={handleclipsuccess} severity="success">
+          Output Copied to Clipboard!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar open={clipfail} autoHideDuration={2000} onClose={handleclipfail}>
+        <Alert onClose={handleclipfail} severity="error">
+          Can't Copy Text to Clipboard!
         </Alert>
       </Snackbar>
     </div>
