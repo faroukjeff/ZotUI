@@ -16,18 +16,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @cross_origin() #Using CROSS for Security, to allow exchange of external ressouces safely
 def execzot():
     json_req = request.get_json() #GET zot code from app
-    banned_keys = ["uiop:",":getenv","run-program","call-system","sys:","excl:","sb-ext:"]#banned plugins and functions due to security
     cmd_zot = json_req["cmd"]
-    security_flag=0
-    banned_op = ""
-    for word in banned_keys:
-        if word in cmd_zot:
-            security_flag = 1
-            word_val = [character for character in word if character.isalnum()]
-            word_val = "".join(word_val)
-            banned_op = word_val.upper()
-            break
-    
+    security_flag,banned_op=check_banned(cmd_zot)
     if security_flag == 0:
         #by using subprocess the shell is never called and no process other than sbcl can be executed
         proc = subprocess.Popen(['sbcl', '--disable-debugger','--load', '/usr/local/zot/bin/start.lisp'], stdin=PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -38,7 +28,6 @@ def execzot():
                     proc.stdin.write(line.encode())
 
         proc.stdin.write(b'(quit)')
-
         stdout,stderr = proc.communicate()
         try:
             output_string = str(stdout.decode()).strip()[0:-1].strip()
@@ -52,6 +41,16 @@ def execzot():
 
     response = jsonify(output=output_string)
     return response
+
+def check_banned(cmd_zot):
+    banned_keys = ["uiop:",":getenv","run-program","call-system","sys:","excl:","sb-ext:"]#banned plugins and functions due to security
+    for word in banned_keys:
+        if word in cmd_zot:
+            word_val = [character for character in word if character.isalnum()]
+            word_val = "".join(word_val)
+            banned_op = word_val.upper()
+            return 1,banned_op
+    return 0,""
 
 def clean_output(output): #Removing unecessary text from returned output
     find_key = '* This is '
