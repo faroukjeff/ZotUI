@@ -413,7 +413,7 @@ const toggleDrawer = (anchor, open) => (event) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cmd: inputcode })
         };
-      fetch('http://192.168.1.6:5000/execzot/', requestOptions)
+      fetch('http://192.168.1.8:5000/execzot/', requestOptions)
       .then(response => response.json())
       .then(data => {
           if((data.output.includes("UNSATISFIABLE"))){
